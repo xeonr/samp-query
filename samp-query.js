@@ -1,25 +1,29 @@
 var dgram = require('dgram')
 
 var query = function (options) {
-    return new Promise( (resolve, reject) => {
-        var self = this
+    var self = this;
 
-        if(typeof options === 'string') options.host = options
-        options.port = options.port || 7777
-        options.timeout = options.timeout || 1000
-        
-        if(!options.host) {
-            return reject( new Error('Missing host') );
+    return new Promise((resolve, reject) => {
+        if (typeof options === 'string') {
+            options.host = options;
         }
 
-        if(!isFinite(options.port) || options.port < 1 || options.port > 65535) 
+        options.port = options.port || 7777
+        options.timeout = options.timeout || 1000
+
+        if (!options.host) {
+            return reject(new Error('Missing host'));
+        }
+
+        if (!isFinite(options.port) || options.port < 1 || options.port > 65535) {
             return reject(new Error('Invalid port'));
+        }
 
         var response = {}
 
-        request.call(self, options, 'i', function(error, information) {
+        request.call(self, options, 'i', function (error, information) {
             if (error) {
-                return reject(new Error(error));
+                return reject(error instanceof Error ? error : new Error(error));
             }
 
             response.address = options.host
@@ -32,10 +36,12 @@ var query = function (options) {
             response.online = information.players
             response.ping = information.ping
 
-            request.call(self, options, 'r', function(error, rules) {
+            request.call(self, options, 'r', function (error, rules) {
                 if (error) {
-                    return reject(new Error(error));
+                    return reject(error instanceof Error ? error : new Error(error));
                 }
+
+                delete rules.ping;
 
                 rules.lagcomp = rules.lagcomp === 'On';
 
@@ -43,15 +49,15 @@ var query = function (options) {
 
                 response.rules = rules
 
-                if(response.online > 100) {
+                if (response.online > 100) {
                     response.players = []
 
                     return resolve(response);
                 }
                 else {
-                    request.call(self, options, 'd', function(error, players) {
+                    request.call(self, options, 'd', function (error, players) {
                         if (error) {
-                            return reject(new Error(error));
+                            return reject(error instanceof Error ? error : new Error(error));
                         }
 
                         response.players = players
@@ -64,15 +70,15 @@ var query = function (options) {
     });
 }
 
-var request = function(options, opcode, callback) {
+var request = function (options, opcode, callback) {
 
     var socket = dgram.createSocket("udp4")
     var packet = Buffer.alloc(10 + opcode.length)
 
     packet.write('SAMP')
 
-    for(var i = 0; i < 4; ++i) 
-    packet[i + 4] = options.host.split('.')[i]
+    for (var i = 0; i < 4; ++i)
+        packet[i + 4] = options.host.split('.')[i]
 
     packet[8] = options.port & 0xFF
     packet[9] = options.port >> 8 & 0xFF
@@ -80,19 +86,19 @@ var request = function(options, opcode, callback) {
 
     let ping_start;
     try {
-        socket.send(packet, 0, packet.length, options.port, options.host, function(error, bytes) {
-            if(error) return callback.apply(options, [ error ])
+        socket.send(packet, 0, packet.length, options.port, options.host, function (error, bytes) {
+            if (error) return callback.apply(options, [error])
             ping_start = Date.now();
         })
-    } catch(error) {
-        return callback.apply(options, [ error ])
+    } catch (error) {
+        return callback.apply(options, [error])
     }
 
     var controller = undefined
 
-    var onTimeOut = function() {
+    var onTimeOut = function () {
         socket.close()
-        return callback.apply(options, [ 'Host unavailable' ])
+        return callback.apply(options, ['Host unavailable'])
     }
 
     controller = setTimeout(onTimeOut, options.timeout)
@@ -100,23 +106,23 @@ var request = function(options, opcode, callback) {
     socket.on('message', function (message) {
         let ping = Date.now() - ping_start;
 
-        if(controller)
+        if (controller)
             clearTimeout(controller)
 
-        if(message.length < 11) return callback.apply(options, [ true ])
+        if (message.length < 11) return callback.apply(options, [true])
         else {
             socket.close()
 
             message = message.slice(11)
 
-            var object = {ping}
+            var object = { ping }
             var array = []
             var strlen = 0
             var offset = 0
 
             try {
 
-                if(opcode == 'i') {               
+                if (opcode == 'i') {
 
                     object.passworded = message.readUInt8(offset)
                     offset += 1
@@ -142,18 +148,18 @@ var request = function(options, opcode, callback) {
 
                     object.language = decode(message.slice(offset, offset += strlen))
 
-                    return callback.apply(options, [ false, object ])
+                    return callback.apply(options, [false, object])
 
                 }
 
-                if(opcode == 'r') {
+                if (opcode == 'r') {
 
-                    var rulecount  = message.readUInt16LE(offset)
+                    var rulecount = message.readUInt16LE(offset)
                     offset += 2
 
                     var property, value = undefined
 
-                    while(rulecount) {
+                    while (rulecount) {
 
                         strlen = message.readUInt8(offset)
                         ++offset
@@ -170,17 +176,17 @@ var request = function(options, opcode, callback) {
                         --rulecount
                     }
 
-                    return callback.apply(options, [ false, object ])
+                    return callback.apply(options, [false, object])
                 }
 
-                if(opcode == 'd') {
+                if (opcode == 'd') {
 
                     var playercount = message.readUInt16LE(offset)
                     offset += 2
 
                     var player = undefined;
 
-                    while(playercount) {
+                    while (playercount) {
 
                         player = {}
 
@@ -203,18 +209,18 @@ var request = function(options, opcode, callback) {
                         --playercount
                     }
 
-                    return callback.apply(options, [ false, array ])
+                    return callback.apply(options, [false, array])
                 }
 
             } catch (exception) {
-                return callback.apply(options, [ exception ])
+                return callback.apply(options, [exception])
             }
         }
     })
 }
 
 const iconv = require('iconv-lite');
-var decode = function(buffer) {
+var decode = function (buffer) {
     return iconv.decode(buffer, 'win1251');
 }
 

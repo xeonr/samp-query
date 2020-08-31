@@ -1,11 +1,12 @@
 {
-  "name": "samp-query",
+  "name": "@sagl/samp-query",
   "version": "0.1.4",
   "description": "Simplified Query API for SAMP",
   "main": "samp-query.js",
+  "types": "samp-query.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/JJJ4n/node-samp-query.git"
+    "url": "https://github.com/sa-gl/samp-query.git"
   },
   "keywords": [
     "samp",
@@ -15,9 +16,9 @@
   ],
   "author": "JJJan <rueckert@trine.io>",
   "bugs": {
-    "url": "https://github.com/JJJ4n/node-samp-query/issues"
+    "url": "https://github.com/sa-gl/samp-query/issues"
   },
-  "homepage": "https://github.com/JJJ4n/node-samp-query",
+  "homepage": "https://github.com/sa-gl/samp-query",
   "dependencies": {
     "iconv-lite": "^0.6.2"
   }

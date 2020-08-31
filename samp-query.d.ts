@@ -1,4 +1,4 @@
-namespace Query {
+declare namespace Query {
     export interface QueryOptions {
         host: string;
         port?: number;
@@ -25,5 +25,6 @@ namespace Query {
         players: QueryPlayer[];
     }
 }
-const Query: (options: Query.QueryOptions) => Promise<Query.QueryResponse>;
+declare const Query: (options: Query.QueryOptions) => Promise<Query.QueryResponse>;
+
 export = Query;

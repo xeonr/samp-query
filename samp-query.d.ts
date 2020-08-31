@@ -18,6 +18,7 @@ declare namespace Query {
         hostname: string;
         gamemode: string;
         language: string;
+        ping: number;
         passworded: boolean;
         maxplayers: number;
         online: number;

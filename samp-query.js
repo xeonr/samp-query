@@ -1,59 +1,67 @@
 var dgram = require('dgram')
 
-var query = function (options, callback) {
+var query = function (options) {
+    return new Promise( (resolve, reject) => {
+        var self = this
 
-    var self = this
+        if(typeof options === 'string') options.host = options
+        options.port = options.port || 7777
+        options.timeout = options.timeout || 1000
+        
+        if(!options.host) {
+            return reject( new Error('Missing host') );
+        }
 
-    if(typeof options === 'string') options.host = options
-    options.port = options.port || 7777
-    options.timeout = options.timeout || 1000
-    
-    if(!options.host) 
-        return callback.apply(options, [ 'Invalid host' ])
+        if(!isFinite(options.port) || options.port < 1 || options.port > 65535) 
+            return reject(new Error('Invalid port'));
 
-    if(!isFinite(options.port) || options.port < 1 || options.port > 65535) 
-        return callback.apply(options, [ 'Invalid port' ])
+        var response = {}
 
-    var response = {}
-
-    request.call(self, options, 'i', function(error, information) {
-        if(error) return callback.apply(options, [ error ])
-
-        response.address = options.host
-        response.port = options.port
-        response.hostname = information.hostname
-        response.gamemode = information.gamemode
-        response.language = information.language
-        response.passworded = information.passworded === 1
-        response.maxplayers = information.maxplayers
-        response.online = information.players
-        response.ping = information.ping
-
-        request.call(self, options, 'r', function(error, rules) {
-            if(error) return callback.apply(options, [ error ])
-
-            rules.lagcomp = rules.lagcomp === 'On'
-
-            rules.weather = parseInt(rules.weather, 10)
-
-            response.rules = rules
-
-            if(response.online > 100) {
-                response.players = []
-
-                return callback.apply(options, [ false, response ])
+        request.call(self, options, 'i', function(error, information) {
+            if (error) {
+                return reject(new Error(error));
             }
-            else {
-                request.call(self, options, 'd', function(error, players) {
-                    if(error) return callback.apply(options, [ error ])
 
-                    response.players = players
+            response.address = options.host
+            response.port = options.port
+            response.hostname = information.hostname
+            response.gamemode = information.gamemode
+            response.language = information.language
+            response.passworded = information.passworded === 1
+            response.maxplayers = information.maxplayers
+            response.online = information.players
+            response.ping = information.ping
 
-                    return callback.apply(options, [ false, response ])
-                })
-            }
+            request.call(self, options, 'r', function(error, rules) {
+                if (error) {
+                    return reject(new Error(error));
+                }
+
+                rules.lagcomp = rules.lagcomp === 'On';
+
+                rules.weather = parseInt(rules.weather, 10)
+
+                response.rules = rules
+
+                if(response.online > 100) {
+                    response.players = []
+
+                    return resolve(response);
+                }
+                else {
+                    request.call(self, options, 'd', function(error, players) {
+                        if (error) {
+                            return reject(new Error(error));
+                        }
+
+                        response.players = players
+
+                        return resolve(response);
+                    })
+                }
+            })
         })
-    })
+    });
 }
 
 var request = function(options, opcode, callback) {

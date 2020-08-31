@@ -21,12 +21,13 @@ var options = {
 	host: '94.23.166.205'
 }
 
-query(options, function (error, response) {
-	if(error)
-		console.log(error)
-	else 
-		console.log(response)
+query(options)
+.then( response => {
+	console.log(response)
 })
+.catch( error => {
+	console.log(error);
+});
 ```
 
 #### Sample output
@@ -35,7 +36,7 @@ query(options, function (error, response) {
 	address: '94.23.166.205',
 	hostname: '• German Extreme Freeroam • Stunt/Derby/Race/DM/Free',
 	gamemode: 'Stunt Race Derby DM Fun',
-	mapname: 'San Andreas',
+	language: 'French',
 	passworded: false,
 	maxplayers: 500,
 	online: 12,

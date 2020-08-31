@@ -18,5 +18,7 @@
     "url": "https://github.com/JJJ4n/node-samp-query/issues"
   },
   "homepage": "https://github.com/JJJ4n/node-samp-query",
-  "dependencies": { 'iconv-lite': '*' }
+  "dependencies": {
+    "iconv-lite": "^0.6.2"
+  }
 }

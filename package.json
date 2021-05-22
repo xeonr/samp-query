@@ -1,6 +1,6 @@
 {
   "name": "@sagl/samp-query",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Simplified Query API for SAMP",
   "main": "samp-query.js",
   "types": "samp-query.d.ts",

@@ -43,9 +43,14 @@ var query = function (options) {
 
                 delete rules.ping;
 
-                rules.lagcomp = rules.lagcomp === 'On';
-
-                rules.weather = parseInt(rules.weather, 10)
+                if (typeof rules.lagcomp !== "undefined") {
+                    rules.lagcomp = rules.lagcomp === 'On';
+                }
+                if (typeof rules.weather !== "undefined") {
+                    if (!isNaN(rules.weather)) {
+                        rules.weather = parseInt(rules.weather, 10);
+                    }
+                }
 
                 response.rules = rules
 

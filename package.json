@@ -1,9 +1,9 @@
 {
   "name": "@xeonr/samp-query",
-  "version": "0.1.5",
+  "version": "1.0.0",
   "description": "Simplified Query API for SAMP",
-  "main": "samp-query.js",
-  "types": "samp-query.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/xeonr/samp-query.git"
@@ -18,8 +18,13 @@
   "bugs": {
     "url": "https://github.com/sa-gl/samp-query/issues"
   },
+  "scripts": {
+    "build": "tsc --project ."
+  },
   "homepage": "https://github.com/sa-gl/samp-query",
   "dependencies": {
-    "iconv-lite": "^0.6.2"
+    "@types/node": "^15.12.4",
+    "iconv-lite": "^0.6.2",
+    "typescript": "^4.3.4"
   }
 }

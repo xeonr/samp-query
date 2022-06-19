@@ -1,6 +1,6 @@
 {
   "name": "@xeonr/samp-query",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Simplified Query API for SAMP",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -25,6 +25,7 @@
   "dependencies": {
     "@types/node": "^15.12.4",
     "iconv-lite": "^0.6.2",
+    "is-ip": "^3.1.0",
     "typescript": "^4.3.4"
   }
 }

@@ -1,6 +1,7 @@
 import { createSocket } from 'dgram';
 import { parseInformation, ISAMPInformation, ISAMPRules, parseRules, parsePlayers, ISAMPPlayer } from './parse';
 import { resolve4 } from 'dns';
+import isIP from 'is-ip';
 import { promisify } from 'util';
 
 const resolve = promisify(resolve4);
@@ -28,8 +29,10 @@ async function validateRequest(request: TSAMPRequest): Promise<ISAMPInternalRequ
 	}
 
 	try {
-		const ips = await resolve(validate.ip);
-		validate.ip = ips[0];
+		if (!isIP(validate.ip)) {
+			const ips = await resolve(validate.ip);
+			validate.ip = ips[0];
+		}
 	} catch (e) {
 		throw new Error('Invalid hostname');
 	}
